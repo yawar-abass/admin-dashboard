@@ -49,8 +49,6 @@ function Navbar() {
               )}
             </div>
           </div>
-
-          {/* Hambergur mobile menu  */}
         </div>
       </div>
     </header>

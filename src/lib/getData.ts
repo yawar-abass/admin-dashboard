@@ -40,6 +40,7 @@ export async function getBooks(page: number, limit: number): Promise<Book[]> {
 
   try {
     const response = await fetch(url);
+
     if (!response.ok) {
       throw new Error(`Error fetching books: ${response.statusText}`);
     }
