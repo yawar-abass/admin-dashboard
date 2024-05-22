@@ -1,9 +1,19 @@
-import Link from "next/link";
-import React from "react";
-import { auth, signIn, signOut } from "../../../auth";
+"use client";
 
-async function Navbar() {
-  const session = await auth();
+import { signIn, signOut, useSession } from "next-auth/react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import React from "react";
+
+function Navbar() {
+  const { data: session } = useSession();
+  const router = useRouter();
+
+  function signInHandler() {
+    signIn();
+    router.push("/dashboard");
+  }
+
   return (
     <header className=" py-4   md:py-6  bg-gray-50">
       <div className="container px-4 mx-auto sm:px-6 lg:px-24">
@@ -20,36 +30,22 @@ async function Navbar() {
                   <p className="text-black font-semibold text-sm">
                     {session.user.name}
                   </p>
-                  <form
-                    action={async () => {
-                      "use server";
-                      await signOut();
-                    }}
-                  >
-                    <button
-                      className="inline-flex items-center justify-center px-5 py-2 text-base font-bold leading-7 text-white transition-all duration-200 bg-gray-900 border border-transparent rounded-xl hover:bg-gray-600 font-pj focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
-                      role="button"
-                      type="submit"
-                    >
-                      Logout
-                    </button>
-                  </form>
-                </div>
-              ) : (
-                <form
-                  action={async () => {
-                    "use server";
-                    await signIn("", { redirectTo: "/dashboard" });
-                  }}
-                >
                   <button
                     className="inline-flex items-center justify-center px-5 py-2 text-base font-bold leading-7 text-white transition-all duration-200 bg-gray-900 border border-transparent rounded-xl hover:bg-gray-600 font-pj focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
                     role="button"
-                    type="submit"
+                    onClick={() => signOut()}
                   >
-                    Login
+                    Logout
                   </button>
-                </form>
+                </div>
+              ) : (
+                <button
+                  className="inline-flex items-center justify-center px-5 py-2 text-base font-bold leading-7 text-white transition-all duration-200 bg-gray-900 border border-transparent rounded-xl hover:bg-gray-600 font-pj focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
+                  role="button"
+                  onClick={signInHandler}
+                >
+                  Login
+                </button>
               )}
             </div>
           </div>
