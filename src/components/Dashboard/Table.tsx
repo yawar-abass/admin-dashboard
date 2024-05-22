@@ -1,10 +1,8 @@
 "use client";
 
 import * as React from "react";
-import PropTypes from "prop-types";
 import {
   Box,
-  Checkbox,
   Paper,
   Table,
   TableBody,
@@ -114,8 +112,8 @@ export default function EnhancedTable({ data }: EnhancedTableProps) {
     saveAs(blob, "books.csv");
   };
 
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+  // const emptyRows =
+  //   page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
   const visibleRows = React.useMemo(
     () =>
@@ -137,7 +135,11 @@ export default function EnhancedTable({ data }: EnhancedTableProps) {
             onChange={handleSearchChange}
             sx={{ mb: 2, mr: 2 }}
           />
-          <Button variant="contained" onClick={handleDownloadCSV}>
+          <Button
+            variant="contained"
+            sx={{ height: 50 }}
+            onClick={handleDownloadCSV}
+          >
             Download CSV
           </Button>
         </Box>
@@ -176,15 +178,7 @@ export default function EnhancedTable({ data }: EnhancedTableProps) {
                   </TableRow>
                 );
               })}
-              {emptyRows > 0 && (
-                <TableRow
-                  style={{
-                    height: 53 * emptyRows,
-                  }}
-                >
-                  <TableCell colSpan={6} />
-                </TableRow>
-              )}
+
               {loading && (
                 <TableRow>
                   <TableCell colSpan={6} align="center">
