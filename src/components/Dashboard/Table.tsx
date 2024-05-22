@@ -14,52 +14,32 @@ import {
   TableRow,
   CircularProgress,
   Typography,
+  TextField,
+  Button,
 } from "@mui/material";
+import Papa from "papaparse";
+import { saveAs } from "file-saver";
 
 import EnhancedTableHead from "./TableHead";
 import { useEffect } from "react";
 import { getBooks } from "@/lib/getData";
 import { Book } from "@/lib/types";
 import { Order } from "@/lib/types";
+import { getComparator, stableSort } from "@/lib/helpers";
 
 interface EnhancedTableProps {
   data: Book[];
 }
 
-function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-  if (b[orderBy] < a[orderBy]) return -1;
-  if (b[orderBy] > a[orderBy]) return 1;
-  return 0;
-}
-
-function getComparator<Key extends keyof Book>(
-  order: Order,
-  orderBy: Key
-): (a: Book, b: Book) => number {
-  return order === "desc"
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-function stableSort<T>(array: T[], comparator: (a: T, b: T) => number) {
-  const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-  return stabilizedThis.map((el) => el[0]);
-}
-
 export default function EnhancedTable({ data }: EnhancedTableProps) {
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] = React.useState<keyof Book>("firstPublishYear");
-  // const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [rows, setRows] = React.useState<Book[]>(data);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = React.useState("");
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -69,34 +49,6 @@ export default function EnhancedTable({ data }: EnhancedTableProps) {
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
   };
-
-  // const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   if (event.target.checked) {
-  //     const newSelected = rows.map((n) => n.key);
-  //     setSelected(newSelected);
-  //     return;
-  //   }
-  //   setSelected([]);
-  // };
-
-  // const handleClick = (event, id) => {
-  //   const selectedIndex = selected.indexOf(id);
-  //   let newSelected = [];
-
-  //   if (selectedIndex === -1) {
-  //     newSelected = newSelected.concat(selected, id);
-  //   } else if (selectedIndex === 0) {
-  //     newSelected = newSelected.concat(selected.slice(1));
-  //   } else if (selectedIndex === selected.length - 1) {
-  //     newSelected = newSelected.concat(selected.slice(0, -1));
-  //   } else if (selectedIndex > 0) {
-  //     newSelected = newSelected.concat(
-  //       selected.slice(0, selectedIndex),
-  //       selected.slice(selectedIndex + 1)
-  //     );
-  //   }
-  //   setSelected(newSelected);
-  // };
 
   // Effect to fetch data based on page and rowsPerPage
   useEffect(() => {
@@ -140,21 +92,55 @@ export default function EnhancedTable({ data }: EnhancedTableProps) {
     setPage(0);
   };
 
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const filteredRows = rows.filter((row) =>
+    row.authorName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleDownloadCSV = () => {
+    const csvData = visibleRows.map((row, index) => ({
+      id: index + 1,
+      "Book Title": row.title,
+      Author: row.authorName,
+      "Published Year": row.firstPublishYear,
+      Subject: row.subject,
+      "Author Birthdate": row.authorBirthdate,
+    }));
+    const csv = Papa.unparse(csvData);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    saveAs(blob, "books.csv");
+  };
+
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
   const visibleRows = React.useMemo(
     () =>
-      stableSort(rows, getComparator(order, orderBy)).slice(
+      stableSort(filteredRows, getComparator(order, orderBy)).slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage
       ),
-    [order, orderBy, page, rows, rowsPerPage]
+    [order, orderBy, page, filteredRows, rowsPerPage]
   );
 
   return (
     <Box sx={{ width: "100%" }}>
       <Paper sx={{ width: "100%", mb: 2 }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+          <TextField
+            label="Search by author"
+            variant="outlined"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            sx={{ mb: 2, mr: 2 }}
+          />
+          <Button variant="contained" onClick={handleDownloadCSV}>
+            Download CSV
+          </Button>
+        </Box>
         <TableContainer>
           <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle">
             <EnhancedTableHead
