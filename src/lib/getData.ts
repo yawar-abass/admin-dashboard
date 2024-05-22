@@ -6,19 +6,28 @@ interface AuthorDetails {
   top_work: string;
 }
 
-// Fetch author details
+// Cache for author details
+const authorDetailsCache: Record<string, AuthorDetails> = {};
+
+// Fetch author details with caching
 async function fetchAuthorDetails(authorKey: string): Promise<AuthorDetails> {
   const authorUrl = `https://openlibrary.org/authors/${authorKey}.json`;
   try {
+    if (authorDetailsCache[authorKey]) {
+      return authorDetailsCache[authorKey];
+    }
+
     const response = await fetch(authorUrl);
     if (!response.ok) {
       throw new Error(`Error fetching author details: ${response.statusText}`);
     }
     const authorData = await response.json();
-    return {
+    const authorDetails: AuthorDetails = {
       birth_date: authorData.birth_date || "Unknown",
       top_work: authorData.top_work || "Unknown",
     };
+    authorDetailsCache[authorKey] = authorDetails; // Store in cache
+    return authorDetails;
   } catch (error: any) {
     console.error("Error fetching author details: ", error.message);
     return { birth_date: "Unknown", top_work: "Unknown" };
@@ -30,7 +39,7 @@ export async function getBooks(page: number, limit: number): Promise<Book[]> {
   const url = `https://openlibrary.org/search.json?q=subject:science_fiction&limit=${limit}&page=${page}`;
 
   try {
-    const response = await fetch(url, { cache: "no-store" });
+    const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`Error fetching books: ${response.statusText}`);
     }

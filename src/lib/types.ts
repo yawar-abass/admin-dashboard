@@ -5,7 +5,7 @@ export interface Book {
   authorName: string;
   firstPublishYear: number;
   subject: string;
-  authorBirthdate: string;
+  authorBirthdate?: string;
   authorTopWork?: string;
 }
 
