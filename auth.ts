@@ -22,7 +22,7 @@ const config = {
   callbacks: {
     authorized({ request, auth }) {
       const { pathname } = request.nextUrl;
-      if (pathname === "/middleware-page") return !!auth;
+      if (pathname === "/dashboard") return !!auth;
       return true;
     },
   },

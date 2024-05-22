@@ -53,6 +53,9 @@ To learn more about Next.js, check out the [Next.js documentation](https://nextj
 
 > **Note:** The assignment is designed to be pixel perfect. For the best viewing experience, please open it on a larger screen.
 
-```
+## Access Dashboard
 
-```
+To access the dashboard, click on the login Button and use the following credentials:
+
+- **Username:** admin
+- **Password:** root
