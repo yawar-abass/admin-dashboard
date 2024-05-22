@@ -1,6 +1,10 @@
 "use client";
 
 import * as React from "react";
+import Papa from "papaparse";
+import { saveAs } from "file-saver";
+import { useEffect } from "react";
+
 import {
   Box,
   Paper,
@@ -15,14 +19,11 @@ import {
   TextField,
   Button,
 } from "@mui/material";
-import Papa from "papaparse";
-import { saveAs } from "file-saver";
-
 import EnhancedTableHead from "./TableHead";
-import { useEffect } from "react";
+
 import { getBooks } from "@/lib/getData";
-import { Book } from "@/lib/types";
-import { Order } from "@/lib/types";
+import type { Book } from "@/lib/types";
+import type { Order } from "@/lib/types";
 import { getComparator, stableSort } from "@/lib/helpers";
 
 interface EnhancedTableProps {

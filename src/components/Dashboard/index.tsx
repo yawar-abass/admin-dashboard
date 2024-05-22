@@ -3,7 +3,7 @@ import EnhancedTable from "./Table";
 import { getBooks } from "@/lib/getData";
 
 const Dashboard = async () => {
-  const data = await getBooks(1, 300);
+  const data = await getBooks(1, 100);
 
   return (
     <div className="pt-12">

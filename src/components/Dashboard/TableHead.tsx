@@ -1,4 +1,4 @@
-import { Book, Order } from "@/lib/types";
+import type { Book, Order } from "@/lib/types";
 import {
   Box,
   Checkbox,

@@ -4,14 +4,16 @@ import { useEffect } from "react";
 
 export default function Error({
   error,
-  reset,
 }: {
   error: Error & { digest?: string };
-  reset: () => void;
 }) {
   useEffect(() => {
     console.error(error);
   }, [error]);
+
+  function reset() {
+    window.location.reload();
+  }
 
   return (
     <div className="h-[50vh] flex flex-col justify-center items-center mx-auto">
