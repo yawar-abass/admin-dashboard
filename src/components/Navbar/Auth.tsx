@@ -2,6 +2,7 @@
 import React from "react";
 import { auth, signIn, signOut } from "../../../auth";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 const Auth = async () => {
   const session = await auth();
@@ -30,7 +31,8 @@ const Auth = async () => {
         ) : (
           <form
             action={async () => {
-              "use server";
+              revalidatePath("/api/auth/signin/");
+              ("use server");
               await signIn("credentials", { redirectTo: "/dashboard" });
             }}
           >
