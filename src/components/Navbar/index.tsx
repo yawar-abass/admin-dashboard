@@ -10,7 +10,7 @@ function Navbar() {
   const router = useRouter();
 
   function signInHandler() {
-    signIn();
+    signIn("", { callbackUrl: "/dashboard" });
     router.push("/dashboard");
   }
 
